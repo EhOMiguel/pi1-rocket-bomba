@@ -7,9 +7,13 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 
+#define RX_PIN_GPS 17
+#define TX_PIN_GPS 16
+#define CS_SD_CARD 5
+#define CLK_SD_CARD 18
+#define MOSI_SD_CARD 23
+#define MISO_SD_CARD 19
 
-#define RX_PIN 25
-#define TX_PIN 27
 
 WiFiServer server(80);
 const char *ssid = "ESP32-Access-Point";
