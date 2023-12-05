@@ -14,12 +14,34 @@
 #define MOSI_SD_CARD 23
 #define MISO_SD_CARD 19
 
+const unsigned char UBLOX_INIT[] PROGMEM =
+{
+  //// Rate (pick one)
+  // 0xB5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x01,0x00,0x01,0x00,0x7A,0x12, //(10Hz)
+  0xB5,0x62,0x06,0x08,0x06,0x00,0xC8,0x00,0x01,0x00,0x01,0x00,0xDE,0x6A, //(5Hz)
+  // 0xB5,0x62,0x06,0x08,0x06,0x00,0xE8,0x03,0x01,0x00,0x01,0x00,0x01,0x39, //(1Hz)
+  //// Disable specific NMEA sentences
+  // 0xB5,0x62,0x06,0x01,0x08,0x00,0xF0,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x00,0x24, // GxGGA off
+  // 0xB5,0x62,0x06,0x01,0x08,0x00,0xF0,0x01,0x00,0x00,0x00,0x00,0x00,0x01,0x01,0x2B, // GxGLL off
+  //0xB5,0x62,0x06,0x01,0x08,0x00,0xF0,0x02,0x00,0x00,0x00,0x00,0x00,0x01,0x02,0x32, // GxGSA off
+  0xB5,0x62,0x06,0x01,0x08,0x00,0xF0,0x03,0x00,0x00,0x00,0x00,0x00,0x01,0x03,0x39, // GxGSV off
+  0xB5,0x62,0x06,0x01,0x08,0x00,0xF0,0x04,0x00,0x00,0x00,0x00,0x00,0x01,0x04,0x40, // GxRMC off
+  0xB5,0x62,0x06,0x01,0x08,0x00,0xF0,0x05,0x00,0x00,0x00,0x00,0x00,0x01,0x05,0x47 // GxVTG off
 
-WiFiServer server(80);
-const char *ssid = "ESP32-Access-Point";
-const char *password = "123456789";
+  // Rate
+  // 0xB5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x01,0x00,0x01,0x00,0x7A,0x12,   // (10Hz)
+  //0xB5,0x62,0x06,0x08,0x06,0x00,0xC8,0x00,0x01,0x00,0x01,0x00,0xDE,0x6A, // (5Hz)
+  //0xB5,0x62,0x06,0x08,0x06,0x00,0xE8,0x03,0x01,0x00,0x01,0x00,0x01,0x39  // (1Hz)
+};
 
+
+WiFiServer server(2503);
+const char *ssid = "LaBamba";  // SSID para o Wifi da ESP32
+const char *password = "123456789";      // Senha para a rede Wifi da ESP32
+
+char formatted_string[150];
 float flat = 0.0f, flon = 0.0f;
+long altitude;
 float speed;
 unsigned long age;
 byte month, hour, day, minute, second;
@@ -39,12 +61,20 @@ void setup()
 
   // Configura a ESP32 como Access Point
   WiFi.softAP(ssid, password);
+  IPAddress IP = WiFi.softAPIP();
 
-  Serial.println("Access Point Iniciado");
+  Serial.println("Wifi Iniciado");
   Serial.print("IP Address: ");
-  Serial.println(WiFi.softAPIP());
+  Serial.println(IP);
 
   server.begin();
+
+  Serial.write("---------------------- GPS CONFIGURATION START --------------------------\n");
+  for(unsigned int i = 0; i < sizeof(UBLOX_INIT); i++) {
+    Serial.write("Enviando dado...\n");
+    gpsSerial.write( pgm_read_byte(UBLOX_INIT+i) );
+  };
+  Serial.write("-------------------------- GPS RECEPTION FINISH --------------------------\n");
 }
 
 void loop()
@@ -52,49 +82,40 @@ void loop()
   WiFiClient client = server.available();
 
   if (client) {
-    Serial.print("New client available...");
+    // Serial.print("Novo cliente disponível...");
 
     // Agora, envie os dados do GPS para o cliente
     if (client.connected()) {
+      // Serial.println("Cliente conectado!");
 
-      // client.print("HTTP/1.1 200 OK\r\nContent-Type: text/text\r\n\r\n");
-      client.print("LAT=");
-      client.print(flat, 6);
-      client.print(" LON=");
-      client.print(flon, 6);
-      client.print(" SPEED=");
-      client.print(speed);
-      client.print(" DATETIME=");
-      client.println(dt);
+      // client.print("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n");
+      client.println(formatted_string);
+      
+      // delay(100);
     }
   }
+
   read_gps_data();
 
   // write_data_to_sd_card();
 
-  // delay(1000);
+  // delay(200);
+  client.stop();
+  // Serial.println("Cliente desconectado!");
 }
 
 void read_gps_data() {
   while (gpsSerial.available() > 0) {
     if (gps.encode(gpsSerial.read())) {
-      // if (gps.location.isValid()) {
       gps.f_get_position(&flat, &flon, &age);
       speed = gps.f_speed_mps() * 3.6;
+      altitude = gps.altitude();
       gps.crack_datetime(&year, &month, &day, &hour, &minute, &second);
       
       sprintf(dt, "%02d/%02d/%02d %02d:%02d:%02d", day, month, year, hour-3, minute, second);
+      sprintf(formatted_string, "LAT=%.6f;LON=%.6f;ALTITUDE=%ld;SPEED=%.2f;DATETIME=%s", flat, flon, altitude, speed, dt);
 
-      Serial.print("LAT=");
-      Serial.print(flat, 6);
-      Serial.print(" LON=");
-      Serial.print(flon, 6);
-      Serial.print(" SPEED=");
-      Serial.print(speed);
-      Serial.print(" DATETIME=");
-      Serial.println(dt);
+      Serial.println(formatted_string);
     }
   }
-  
-  // gps.stats(&chars, &sentences, &failed);
 }
