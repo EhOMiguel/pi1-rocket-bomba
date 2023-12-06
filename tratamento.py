@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+import requests
 import math
 
 def ler_dados_no_intervalo(caminho_arquivo, inicio_str, fim_str):
@@ -164,4 +165,13 @@ json_final = montar_json(id_lancamento, volume, peso, angulo, pressao, deslocame
 print(f"O deslocamento total da trajetória do foguete é: {deslocamento} metros")
 print(f"A distância total 3D percorrida pelo foguete é: {distancia_total_3d_metros} metros")
 json_final = montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, latitudes, longitudes, altitudes, velocidades)
-# print(json_final)
+#print(json_final)
+
+url='https://bomba-api.onrender.com/lancamento'
+
+response = requests.post(url, data=json_final, headers={'Content-Type': 'application/json'})
+
+# Verificando a response da API
+print("Status:", response.status_code)
+print("Response:", response.json())
+
