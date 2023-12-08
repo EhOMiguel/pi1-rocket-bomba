@@ -5,8 +5,8 @@ import math
 
 def ler_dados_no_intervalo(caminho_arquivo, inicio_str, fim_str):
     # Convertendo as strings de tempo para objetos datetime
-    tempo_inicio = datetime.strptime(inicio_str, '%d/%m/%y %H:%M:%S')
-    tempo_fim = datetime.strptime(fim_str, '%d/%m/%y %H:%M:%S')
+    tempo_inicio = datetime.strptime(inicio_str, '%d/%m/%Y %H:%M:%S')
+    tempo_fim = datetime.strptime(fim_str, '%d/%m/%Y %H:%M:%S')
 
     dados_selecionados = []
 
@@ -147,8 +147,8 @@ pressao = 28
 caminho_arquivo = 'dados_gps.txt'
 
 # Definindo o intervalo de tempo desejado
-inicio_str = '07/12/23 18:33:00'
-fim_str = '07/12/23 10:33:06'
+inicio_str = '07/12/2023 18:33:00'
+fim_str = '07/12/2023 18:33:06'
 
 # Lendo os dados dentro do intervalo de tempo
 dados_no_intervalo = ler_dados_no_intervalo(caminho_arquivo, inicio_str, fim_str)
