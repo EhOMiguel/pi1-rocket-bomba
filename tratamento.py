@@ -39,7 +39,7 @@ def extrair_dados_para_listas(lista_dados):
         latitudes.append(float(dicionario_dados['LAT']))
         longitudes.append(float(dicionario_dados['LON']))
         altitudes.append(float(dicionario_dados['ALTITUDE']))
-        velocidades.append(float(dicionario_dados['SPEED']))
+        velocidades.append(float(dicionario_dados['SPEED']) * 3.6)
 
     return latitudes, longitudes, altitudes, velocidades
 
@@ -120,8 +120,8 @@ def montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, lati
             "latitude": latitudes[i],
             "longitude": longitudes[i],
             "altitude": altitudes[i],
-            "velocidadeInst": velocidades[i],
-            "aceleracaoInst": aceleracoes[i]
+            "velocidadeInst": round(velocidades[i], 2),
+            "aceleracaoInst": round(aceleracoes[i], 2)
         }
         passeio.append(ponto)
 
@@ -131,7 +131,7 @@ def montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, lati
         "peso": peso,
         "angulo": angulo,
         "pressao": pressao,
-        "distancia": deslocamento,
+        "distancia": round(deslocamento, 2),
         "passeio": passeio
     }
 
@@ -147,8 +147,8 @@ pressao = 28
 caminho_arquivo = 'dados_gps.txt'
 
 # Definindo o intervalo de tempo desejado
-inicio_str = '07/12/2023 18:33:00'
-fim_str = '07/12/2023 18:33:06'
+inicio_str = '07/12/2023 18:32:44'
+fim_str = '07/12/2023 18:32:59'
 
 # Lendo os dados dentro do intervalo de tempo
 dados_no_intervalo = ler_dados_no_intervalo(caminho_arquivo, inicio_str, fim_str)
