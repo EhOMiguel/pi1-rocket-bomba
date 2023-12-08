@@ -11,7 +11,7 @@ def receive_data(ip_address, port):
         received_data = data.decode('utf-8')
         
         # Printa dados e salva no arquivo
-        if received_data != '':
+        if received_data != '' and received_data != '\n':
             print("Received data:", received_data)
             with open("dados_gps.txt", "a") as file:
                     file.write(received_data + "\n")
