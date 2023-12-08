@@ -12,11 +12,13 @@ def ler_dados_no_intervalo(caminho_arquivo, inicio_str, fim_str):
 
     with open(caminho_arquivo, 'r') as arquivo:
         for linha in arquivo:
+            if linha == '\n': continue
+
             partes_dados = linha.strip().split(';')
             dicionario_dados = {p.split('=')[0]: p.split('=')[1] for p in partes_dados}
 
             # Convertendo o campo DATETIME em objeto datetime
-            tempo_dado = datetime.strptime(dicionario_dados['DATETIME'], '%d/%m/%y %H:%M:%S')
+            tempo_dado = datetime.strptime(dicionario_dados['DATETIME'], '%d/%m/%Y %H:%M:%S')
 
             # Verificando se o tempo está dentro do intervalo
             if tempo_inicio <= tempo_dado <= tempo_fim:
@@ -135,18 +137,18 @@ def montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, lati
 
     return json.dumps(dados_json, indent=4)
 
-id_lancamento = 0
-volume = 4.4
-peso = 700
+id_lancamento = 10
+volume = 250
+peso = 610
 angulo = 45
-pressao = 217 
+pressao = 28 
 
 # Caminho para o arquivo
 caminho_arquivo = 'dados_gps.txt'
 
 # Definindo o intervalo de tempo desejado
-inicio_str = '01/12/23 10:00:00'
-fim_str = '01/12/23 10:00:04'
+inicio_str = '07/12/23 18:33:00'
+fim_str = '07/12/23 10:33:06'
 
 # Lendo os dados dentro do intervalo de tempo
 dados_no_intervalo = ler_dados_no_intervalo(caminho_arquivo, inicio_str, fim_str)
@@ -165,13 +167,13 @@ json_final = montar_json(id_lancamento, volume, peso, angulo, pressao, deslocame
 print(f"O deslocamento total da trajetória do foguete é: {deslocamento} metros")
 print(f"A distância total 3D percorrida pelo foguete é: {distancia_total_3d_metros} metros")
 json_final = montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, latitudes, longitudes, altitudes, velocidades)
-#print(json_final)
+print(json_final)
 
-url='https://bomba-api.onrender.com/lancamento'
+# url='https://bomba-api.onrender.com/lancamento'
 
-response = requests.post(url, data=json_final, headers={'Content-Type': 'application/json'})
+# response = requests.post(url, data=json_final, headers={'Content-Type': 'application/json'})
 
 # Verificando a response da API
-print("Status:", response.status_code)
-print("Response:", response.json())
+# print("Status:", response.status_code)
+# print("Response:", response.json())
 
