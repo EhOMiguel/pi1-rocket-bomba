@@ -110,7 +110,7 @@ def calcular_aceleracao_instantanea(velocidades):
 
     return aceleracoes
 
-def montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, latitudes, longitudes, altitudes, velocidades):
+def montar_json(id_lancamento, distanciaFoco, distMedida, volume, peso, angulo, pressao, deslocamento, latitudes, longitudes, altitudes, velocidades):
     aceleracoes = calcular_aceleracao_instantanea(velocidades)
     passeio = []
     # print(aceleracoes)
@@ -127,17 +127,21 @@ def montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, lati
 
     dados_json = {
         "idLancamento": id_lancamento,
+        "distanciaFoco": distanciaFoco,
+        "distanciaMedida": distMedida,
         "volume": volume,
         "peso": peso,
         "angulo": angulo,
         "pressao": pressao,
-        "distancia": round(deslocamento, 2),
+        "distanciaGPS": round(deslocamento, 2),
         "passeio": passeio
     }
 
     return json.dumps(dados_json, indent=4)
 
-id_lancamento = 10
+id_lancamento = 2
+distanciaFoco = 20 # distancia que estamos querendo alcançar no lançamento
+distMedida = 0 # distancia alcançada medida manualmente
 volume = 250
 peso = 610
 angulo = 45
@@ -147,8 +151,8 @@ pressao = 28
 caminho_arquivo = 'dados_gps.txt'
 
 # Definindo o intervalo de tempo desejado
-inicio_str = '07/12/2023 18:32:44'
-fim_str = '07/12/2023 18:32:59'
+inicio_str = '07/12/2023 18:38:00'
+fim_str = '07/12/2023 18:38:00'
 
 # Lendo os dados dentro do intervalo de tempo
 dados_no_intervalo = ler_dados_no_intervalo(caminho_arquivo, inicio_str, fim_str)
@@ -162,18 +166,17 @@ deslocamento = calcular_deslocamento(latitudes, longitudes)
 # Calculando a distância total 3D percorrida pelo foguete
 distancia_total_3d_metros = calcular_distancia_total_3d(latitudes, longitudes, altitudes)
 
-json_final = montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, latitudes, longitudes, altitudes, velocidades)
 
 print(f"O deslocamento total da trajetória do foguete é: {deslocamento} metros")
 print(f"A distância total 3D percorrida pelo foguete é: {distancia_total_3d_metros} metros")
-json_final = montar_json(id_lancamento, volume, peso, angulo, pressao, deslocamento, latitudes, longitudes, altitudes, velocidades)
+json_final = montar_json(id_lancamento, distanciaFoco, distMedida, volume, peso, angulo, pressao, deslocamento, latitudes, longitudes, altitudes, velocidades)
 print(json_final)
 
-# url='https://bomba-api.onrender.com/lancamento'
+url='https://bomba-api.onrender.com/lancamento'
 
 # response = requests.post(url, data=json_final, headers={'Content-Type': 'application/json'})
 
-# Verificando a response da API
+# # Verificando a response da API
 # print("Status:", response.status_code)
 # print("Response:", response.json())
 
