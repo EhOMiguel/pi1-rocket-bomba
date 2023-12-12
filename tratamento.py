@@ -139,7 +139,7 @@ def montar_json(id_lancamento, distanciaFoco, distMedida, volume, peso, angulo, 
 
     return json.dumps(dados_json, indent=4)
 
-id_lancamento = 2
+id_lancamento = 4
 distanciaFoco = 20 # distancia que estamos querendo alcançar no lançamento
 distMedida = 0 # distancia alcançada medida manualmente
 volume = 250
@@ -151,8 +151,8 @@ pressao = 28
 caminho_arquivo = 'dados_gps.txt'
 
 # Definindo o intervalo de tempo desejado
-inicio_str = '07/12/2023 18:38:00'
-fim_str = '07/12/2023 18:38:00'
+inicio_str = '11/12/2023 17:25:00'
+fim_str = '11/12/2023 17:25:05'
 
 # Lendo os dados dentro do intervalo de tempo
 dados_no_intervalo = ler_dados_no_intervalo(caminho_arquivo, inicio_str, fim_str)
@@ -174,9 +174,9 @@ print(json_final)
 
 url='https://bomba-api.onrender.com/lancamento'
 
-# response = requests.post(url, data=json_final, headers={'Content-Type': 'application/json'})
+response = requests.post(url, data=json_final, headers={'Content-Type': 'application/json'})
 
-# # Verificando a response da API
-# print("Status:", response.status_code)
-# print("Response:", response.json())
+# Verificando a response da API
+print("Status:", response.status_code)
+print("Response:", response.json())
 

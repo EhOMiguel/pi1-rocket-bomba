@@ -13,7 +13,7 @@ db = client.primeiroLancamento
 collection = db.lancamentos
 
 
-lançamentos = collection.find({}) 
+lançamentos = collection.find({'idLancamento': 4}) 
 window_size = 5
 
 for lançamento in lançamentos:
